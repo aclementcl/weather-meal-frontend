@@ -1,6 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 import { of } from 'rxjs';
 import { LocationsApiService } from '../../../../core/services/locations-api.service';
+import { WeatherApiService } from '../../../../core/services/weather-api.service';
 import { WeatherPlannerPageComponent } from './weather-planner-page.component';
 
 describe('WeatherPlannerPageComponent', () => {
@@ -22,6 +23,27 @@ describe('WeatherPlannerPageComponent', () => {
               ]),
           },
         },
+        {
+          provide: WeatherApiService,
+          useValue: {
+            getWeather: () =>
+              of({
+                location: {
+                  name: 'Santiago',
+                  region: 'Metropolitana de Santiago',
+                  latitude: -33.4489,
+                  longitude: -70.6693,
+                },
+                date: '2026-04-24',
+                weather: {
+                  summary: 'Clear sky',
+                  temperatureMin: 8,
+                  temperatureMax: 22,
+                  weatherCode: 0,
+                },
+              }),
+          },
+        },
       ],
     }).compileComponents();
   });
@@ -40,6 +62,9 @@ describe('WeatherPlannerPageComponent', () => {
     expect(compiled.querySelector('input[type="date"]')).toBeTruthy();
     expect(compiled.querySelector('.selected-location')?.textContent).toContain(
       new Date().getFullYear().toString(),
+    );
+    expect(compiled.querySelector('app-weather-summary')?.textContent).toContain(
+      'Clear sky',
     );
   });
 });

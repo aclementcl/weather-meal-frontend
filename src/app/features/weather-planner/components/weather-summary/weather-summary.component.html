@@ -1,0 +1,45 @@
+<section class="weather-panel" aria-labelledby="weather-title">
+  <div class="panel-heading">
+    <div>
+      <span class="section-label">Clima</span>
+      <h2 id="weather-title">Pronostico del dia</h2>
+    </div>
+  </div>
+
+  @if (weather(); as forecast) {
+    @if (isLoading()) {
+      <div class="weather-state">Consultando clima...</div>
+    } @else if (errorMessage()) {
+      <p class="error-message" role="alert">{{ errorMessage() }}</p>
+    } @else {
+      <div class="forecast">
+        <div class="summary">
+          <span class="weather-icon" aria-hidden="true">WX</span>
+          <div>
+            <p class="description">{{ forecast.weather.summary }}</p>
+            <p class="context">{{ forecast.location.name }} / {{ forecast.date }}</p>
+          </div>
+        </div>
+
+        <dl>
+          <div>
+            <dt>Minima</dt>
+            <dd>{{ Math.round(forecast.weather.temperatureMin) }} C</dd>
+          </div>
+          <div>
+            <dt>Maxima</dt>
+            <dd>{{ Math.round(forecast.weather.temperatureMax) }} C</dd>
+          </div>
+        </dl>
+      </div>
+    }
+  } @else {
+    @if (isLoading()) {
+      <div class="weather-state">Consultando clima...</div>
+    } @else if (errorMessage()) {
+      <p class="error-message" role="alert">{{ errorMessage() }}</p>
+    } @else {
+      <div class="weather-state">Selecciona ciudad y fecha para ver el clima.</div>
+    }
+  }
+</section>

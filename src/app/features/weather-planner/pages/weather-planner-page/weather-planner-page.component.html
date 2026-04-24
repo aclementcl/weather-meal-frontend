@@ -13,7 +13,7 @@
       [selectedCity]="selectedCity()"
       [isLoading]="isLoadingLocations()"
       [errorMessage]="locationError()"
-      (selectedCityChange)="selectedCity.set($event)"
+      (selectedCityChange)="onCityChange($event)"
     />
 
     <app-date-selector
@@ -21,7 +21,13 @@
       [minDate]="minDate"
       [maxDate]="maxDate"
       [dateOptions]="dateOptions"
-      (selectedDateChange)="selectedDate.set($event)"
+      (selectedDateChange)="onDateChange($event)"
+    />
+
+    <app-weather-summary
+      [weather]="weather()"
+      [isLoading]="isLoadingWeather()"
+      [errorMessage]="weatherError()"
     />
 
     @if (selectedLocation(); as location) {
