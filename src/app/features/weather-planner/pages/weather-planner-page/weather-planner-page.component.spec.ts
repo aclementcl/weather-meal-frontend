@@ -90,5 +90,8 @@ describe('WeatherPlannerPageComponent', () => {
     expect(compiled.querySelector('app-menu-suggestion')?.textContent).toContain(
       'Sugerir menu',
     );
+    expect(
+      compiled.querySelector('app-preferences-selector')?.textContent,
+    ).toContain('Vegetariano');
   });
 });

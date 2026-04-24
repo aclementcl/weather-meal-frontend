@@ -30,6 +30,12 @@
       [errorMessage]="weatherError()"
     />
 
+    <app-preferences-selector
+      [options]="preferenceOptions"
+      [selectedPreferences]="selectedPreferences()"
+      (selectedPreferencesChange)="onPreferencesChange($event)"
+    />
+
     <app-menu-suggestion
       [menuSuggestion]="menuSuggestion()"
       [isLoading]="isLoadingMenu()"

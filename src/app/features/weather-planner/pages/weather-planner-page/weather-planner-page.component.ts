@@ -8,6 +8,8 @@ import { WeatherApiService } from '../../../../core/services/weather-api.service
 import { DateSelectorComponent } from '../../components/date-selector/date-selector.component';
 import { LocationSelectorComponent } from '../../components/location-selector/location-selector.component';
 import { MenuSuggestionComponent } from '../../components/menu-suggestion/menu-suggestion.component';
+import { PreferencesSelectorComponent } from '../../components/preferences-selector/preferences-selector.component';
+import { PreferenceOption } from '../../models/preference-option.model';
 import { WeatherSummaryComponent } from '../../components/weather-summary/weather-summary.component';
 
 @Component({
@@ -16,6 +18,7 @@ import { WeatherSummaryComponent } from '../../components/weather-summary/weathe
     DateSelectorComponent,
     LocationSelectorComponent,
     MenuSuggestionComponent,
+    PreferencesSelectorComponent,
     WeatherSummaryComponent,
   ],
   templateUrl: './weather-planner-page.component.html',
@@ -27,8 +30,15 @@ export class WeatherPlannerPageComponent implements OnInit {
   private weatherRequestId = 0;
 
   protected readonly locations = signal<Location[]>([]);
+  protected readonly preferenceOptions: PreferenceOption[] = [
+    { value: 'vegetarian', label: 'Vegetariano' },
+    { value: 'gluten-free', label: 'Sin gluten' },
+    { value: 'dairy-free', label: 'Sin lacteos' },
+    { value: 'high-protein', label: 'Alto en proteina' },
+  ];
   protected readonly selectedCity = signal('');
   protected readonly selectedDate = signal(this.today);
+  protected readonly selectedPreferences = signal<string[]>([]);
   protected readonly menuSuggestion = signal<MenuSuggestResponse | undefined>(
     undefined,
   );
@@ -85,6 +95,11 @@ export class WeatherPlannerPageComponent implements OnInit {
     this.loadWeather();
   }
 
+  protected onPreferencesChange(preferences: string[]): void {
+    this.selectedPreferences.set(preferences);
+    this.resetMenuSuggestion();
+  }
+
   protected suggestMenu(): void {
     const city = this.selectedCity();
     const requestId = ++this.menuRequestId;
@@ -100,7 +115,7 @@ export class WeatherPlannerPageComponent implements OnInit {
       .suggestMenu({
         location: city,
         date: this.selectedDate(),
-        preferences: [],
+        preferences: this.selectedPreferences(),
       })
       .subscribe({
         next: (menuSuggestion) => {
