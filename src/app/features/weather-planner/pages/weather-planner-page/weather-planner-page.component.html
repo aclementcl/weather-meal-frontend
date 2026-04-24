@@ -30,6 +30,14 @@
       [errorMessage]="weatherError()"
     />
 
+    <app-menu-suggestion
+      [menuSuggestion]="menuSuggestion()"
+      [isLoading]="isLoadingMenu()"
+      [errorMessage]="menuError()"
+      [canRequest]="canRequestMenu()"
+      (requestMenu)="suggestMenu()"
+    />
+
     @if (selectedLocation(); as location) {
       <section class="selected-location" aria-label="Ciudad seleccionada">
         <div>

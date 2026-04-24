@@ -1,29 +1,43 @@
 import { Component, OnInit, computed, signal } from '@angular/core';
 import { Location } from '../../../../core/models/location.model';
+import { MenuSuggestResponse } from '../../../../core/models/menu.model';
 import { WeatherResponse } from '../../../../core/models/weather.model';
 import { LocationsApiService } from '../../../../core/services/locations-api.service';
+import { MenuApiService } from '../../../../core/services/menu-api.service';
 import { WeatherApiService } from '../../../../core/services/weather-api.service';
 import { DateSelectorComponent } from '../../components/date-selector/date-selector.component';
 import { LocationSelectorComponent } from '../../components/location-selector/location-selector.component';
+import { MenuSuggestionComponent } from '../../components/menu-suggestion/menu-suggestion.component';
 import { WeatherSummaryComponent } from '../../components/weather-summary/weather-summary.component';
 
 @Component({
   selector: 'app-weather-planner-page',
-  imports: [DateSelectorComponent, LocationSelectorComponent, WeatherSummaryComponent],
+  imports: [
+    DateSelectorComponent,
+    LocationSelectorComponent,
+    MenuSuggestionComponent,
+    WeatherSummaryComponent,
+  ],
   templateUrl: './weather-planner-page.component.html',
   styleUrl: './weather-planner-page.component.css',
 })
 export class WeatherPlannerPageComponent implements OnInit {
   private readonly today = this.toIsoDate(new Date());
+  private menuRequestId = 0;
   private weatherRequestId = 0;
 
   protected readonly locations = signal<Location[]>([]);
   protected readonly selectedCity = signal('');
   protected readonly selectedDate = signal(this.today);
+  protected readonly menuSuggestion = signal<MenuSuggestResponse | undefined>(
+    undefined,
+  );
   protected readonly weather = signal<WeatherResponse | undefined>(undefined);
   protected readonly isLoadingLocations = signal(true);
+  protected readonly isLoadingMenu = signal(false);
   protected readonly isLoadingWeather = signal(false);
   protected readonly locationError = signal('');
+  protected readonly menuError = signal('');
   protected readonly weatherError = signal('');
   protected readonly dateOptions = this.buildDateOptions();
   protected readonly minDate = this.dateOptions[0];
@@ -32,9 +46,13 @@ export class WeatherPlannerPageComponent implements OnInit {
   protected readonly selectedLocation = computed(() =>
     this.locations().find((location) => location.name === this.selectedCity()),
   );
+  protected readonly canRequestMenu = computed(
+    () => !!this.weather() && !this.isLoadingWeather(),
+  );
 
   constructor(
     private readonly locationsApi: LocationsApiService,
+    private readonly menuApi: MenuApiService,
     private readonly weatherApi: WeatherApiService,
   ) {}
 
@@ -57,12 +75,54 @@ export class WeatherPlannerPageComponent implements OnInit {
 
   protected onCityChange(city: string): void {
     this.selectedCity.set(city);
+    this.resetMenuSuggestion();
     this.loadWeather();
   }
 
   protected onDateChange(date: string): void {
     this.selectedDate.set(date);
+    this.resetMenuSuggestion();
     this.loadWeather();
+  }
+
+  protected suggestMenu(): void {
+    const city = this.selectedCity();
+    const requestId = ++this.menuRequestId;
+
+    if (!city || !this.weather()) {
+      return;
+    }
+
+    this.isLoadingMenu.set(true);
+    this.menuError.set('');
+
+    this.menuApi
+      .suggestMenu({
+        location: city,
+        date: this.selectedDate(),
+        preferences: [],
+      })
+      .subscribe({
+        next: (menuSuggestion) => {
+          if (requestId !== this.menuRequestId) {
+            return;
+          }
+
+          this.menuSuggestion.set(menuSuggestion);
+          this.isLoadingMenu.set(false);
+        },
+        error: () => {
+          if (requestId !== this.menuRequestId) {
+            return;
+          }
+
+          this.menuSuggestion.set(undefined);
+          this.menuError.set(
+            'No se pudo generar una sugerencia de menu para este clima.',
+          );
+          this.isLoadingMenu.set(false);
+        },
+      });
   }
 
   private loadWeather(): void {
@@ -98,6 +158,13 @@ export class WeatherPlannerPageComponent implements OnInit {
         this.isLoadingWeather.set(false);
       },
     });
+  }
+
+  private resetMenuSuggestion(): void {
+    this.menuRequestId++;
+    this.menuSuggestion.set(undefined);
+    this.menuError.set('');
+    this.isLoadingMenu.set(false);
   }
 
   private buildDateOptions(): string[] {

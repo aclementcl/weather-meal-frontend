@@ -1,0 +1,47 @@
+<section class="menu-panel" aria-labelledby="menu-title">
+  <div class="panel-heading">
+    <div>
+      <span class="section-label">Menu</span>
+      <h2 id="menu-title">Sugerencia del dia</h2>
+    </div>
+
+    <button
+      type="button"
+      [disabled]="!canRequest() || isLoading()"
+      (click)="requestMenu.emit()"
+    >
+      {{ isLoading() ? 'Generando...' : 'Sugerir menu' }}
+    </button>
+  </div>
+
+  @if (menuSuggestion(); as suggestion) {
+    @if (isLoading()) {
+      <div class="menu-state">Generando desayuno, almuerzo y cena...</div>
+    } @else if (errorMessage()) {
+      <p class="error-message" role="alert">{{ errorMessage() }}</p>
+    } @else {
+      <div class="menu-grid">
+        <article>
+          <span>Desayuno</span>
+          <p>{{ suggestion.menu.breakfast }}</p>
+        </article>
+        <article>
+          <span>Almuerzo</span>
+          <p>{{ suggestion.menu.lunch }}</p>
+        </article>
+        <article>
+          <span>Cena</span>
+          <p>{{ suggestion.menu.dinner }}</p>
+        </article>
+      </div>
+    }
+  } @else {
+    @if (isLoading()) {
+      <div class="menu-state">Generando desayuno, almuerzo y cena...</div>
+    } @else if (errorMessage()) {
+      <p class="error-message" role="alert">{{ errorMessage() }}</p>
+    } @else {
+      <div class="menu-state">Genera una sugerencia cuando el clima este listo.</div>
+    }
+  }
+</section>

@@ -1,6 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 import { of } from 'rxjs';
 import { LocationsApiService } from '../../../../core/services/locations-api.service';
+import { MenuApiService } from '../../../../core/services/menu-api.service';
 import { WeatherApiService } from '../../../../core/services/weather-api.service';
 import { WeatherPlannerPageComponent } from './weather-planner-page.component';
 
@@ -21,6 +22,26 @@ describe('WeatherPlannerPageComponent', () => {
                   longitude: -70.6693,
                 },
               ]),
+          },
+        },
+        {
+          provide: MenuApiService,
+          useValue: {
+            suggestMenu: () =>
+              of({
+                location: 'Santiago',
+                date: '2026-04-24',
+                weather: {
+                  summary: 'Clear sky',
+                  temperatureMin: 8,
+                  temperatureMax: 22,
+                },
+                menu: {
+                  breakfast: 'Avena con fruta',
+                  lunch: 'Ensalada tibia de quinoa',
+                  dinner: 'Sopa de verduras',
+                },
+              }),
           },
         },
         {
@@ -65,6 +86,9 @@ describe('WeatherPlannerPageComponent', () => {
     );
     expect(compiled.querySelector('app-weather-summary')?.textContent).toContain(
       'Clear sky',
+    );
+    expect(compiled.querySelector('app-menu-suggestion')?.textContent).toContain(
+      'Sugerir menu',
     );
   });
 });
