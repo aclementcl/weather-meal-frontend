@@ -1,0 +1,22 @@
+<form class="location-panel">
+  <label for="city">Ciudad</label>
+
+  @if (isLoading()) {
+    <div class="field-placeholder">Cargando ciudades...</div>
+  } @else if (errorMessage()) {
+    <p class="error-message" role="alert">{{ errorMessage() }}</p>
+  } @else {
+    <select
+      id="city"
+      name="city"
+      [ngModel]="selectedCity()"
+      (ngModelChange)="selectedCityChange.emit($event)"
+    >
+      @for (location of locations(); track location.name) {
+        <option [value]="location.name">
+          {{ location.name }} · {{ location.region }}
+        </option>
+      }
+    </select>
+  }
+</form>

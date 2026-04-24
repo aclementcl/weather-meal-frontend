@@ -1,0 +1,62 @@
+.location-panel {
+  background: rgba(255, 255, 255, 0.82);
+  border: 1px solid rgba(24, 33, 31, 0.12);
+  border-radius: 8px;
+  box-shadow: 0 20px 60px rgba(24, 33, 31, 0.08);
+  display: grid;
+  gap: 10px;
+  padding: 20px;
+}
+
+label {
+  color: #34433f;
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+select,
+.field-placeholder {
+  min-height: 48px;
+  width: 100%;
+}
+
+select {
+  appearance: none;
+  background:
+    linear-gradient(45deg, transparent 50%, #0f766e 50%) calc(100% - 22px) 20px /
+      7px 7px no-repeat,
+    linear-gradient(135deg, #0f766e 50%, transparent 50%) calc(100% - 15px) 20px /
+      7px 7px no-repeat,
+    #ffffff;
+  border: 1px solid rgba(24, 33, 31, 0.18);
+  border-radius: 6px;
+  color: #18211f;
+  font: inherit;
+  padding: 0 44px 0 14px;
+}
+
+select:focus {
+  border-color: #0f766e;
+  box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.18);
+  outline: none;
+}
+
+.field-placeholder,
+.error-message {
+  align-items: center;
+  border-radius: 6px;
+  display: flex;
+  margin: 0;
+  padding: 0 14px;
+}
+
+.field-placeholder {
+  background: rgba(15, 118, 110, 0.08);
+  color: #51615d;
+}
+
+.error-message {
+  background: rgba(185, 28, 28, 0.08);
+  color: #991b1b;
+  min-height: 48px;
+}

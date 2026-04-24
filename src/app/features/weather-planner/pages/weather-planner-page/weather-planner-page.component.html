@@ -1,0 +1,40 @@
+<main class="app-shell">
+  <section class="workspace" aria-labelledby="app-title">
+    <div class="intro">
+      <p class="eyebrow">WeatherMeal</p>
+      <h1 id="app-title">Planifica tu menu segun el clima en Chile</h1>
+      <p>
+        Selecciona una ciudad soportada para avanzar con el flujo del challenge.
+      </p>
+    </div>
+
+    <app-location-selector
+      [locations]="locations()"
+      [selectedCity]="selectedCity()"
+      [isLoading]="isLoadingLocations()"
+      [errorMessage]="locationError()"
+      (selectedCityChange)="selectedCity.set($event)"
+    />
+
+    @if (selectedLocation(); as location) {
+      <section class="selected-location" aria-label="Ciudad seleccionada">
+        <div>
+          <span class="section-label">Ubicacion seleccionada</span>
+          <h2>{{ location.name }}</h2>
+          <p>{{ location.region }}</p>
+        </div>
+
+        <dl>
+          <div>
+            <dt>Latitud</dt>
+            <dd>{{ location.latitude }}</dd>
+          </div>
+          <div>
+            <dt>Longitud</dt>
+            <dd>{{ location.longitude }}</dd>
+          </div>
+        </dl>
+      </section>
+    }
+  </section>
+</main>
