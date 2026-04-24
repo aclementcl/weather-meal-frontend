@@ -1,0 +1,28 @@
+<section class="date-panel" aria-labelledby="date-selector-title">
+  <div>
+    <span class="section-label">Fecha</span>
+    <h2 id="date-selector-title">Selecciona el dia</h2>
+  </div>
+
+  <label for="forecast-date">Fecha del pronostico</label>
+  <input
+    id="forecast-date"
+    type="date"
+    [value]="selectedDate()"
+    [min]="minDate()"
+    [max]="maxDate()"
+    (change)="onDateInput($any($event.target).value)"
+  />
+
+  <div class="date-options" aria-label="Fechas disponibles">
+    @for (date of dateOptions(); track date) {
+      <button
+        type="button"
+        [class.is-selected]="isSelected(date)"
+        (click)="selectDate(date)"
+      >
+        {{ date }}
+      </button>
+    }
+  </div>
+</section>

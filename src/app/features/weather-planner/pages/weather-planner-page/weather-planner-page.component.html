@@ -16,15 +16,27 @@
       (selectedCityChange)="selectedCity.set($event)"
     />
 
+    <app-date-selector
+      [selectedDate]="selectedDate()"
+      [minDate]="minDate"
+      [maxDate]="maxDate"
+      [dateOptions]="dateOptions"
+      (selectedDateChange)="selectedDate.set($event)"
+    />
+
     @if (selectedLocation(); as location) {
       <section class="selected-location" aria-label="Ciudad seleccionada">
         <div>
-          <span class="section-label">Ubicacion seleccionada</span>
+          <span class="section-label">Busqueda seleccionada</span>
           <h2>{{ location.name }}</h2>
           <p>{{ location.region }}</p>
         </div>
 
         <dl>
+          <div>
+            <dt>Fecha</dt>
+            <dd>{{ selectedDate() }}</dd>
+          </div>
           <div>
             <dt>Latitud</dt>
             <dd>{{ location.latitude }}</dd>

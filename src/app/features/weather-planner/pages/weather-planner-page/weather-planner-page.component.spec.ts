@@ -37,5 +37,9 @@ describe('WeatherPlannerPageComponent', () => {
     expect(compiled.querySelector('.selected-location h2')?.textContent).toContain(
       'Santiago',
     );
+    expect(compiled.querySelector('input[type="date"]')).toBeTruthy();
+    expect(compiled.querySelector('.selected-location')?.textContent).toContain(
+      new Date().getFullYear().toString(),
+    );
   });
 });
