@@ -16,15 +16,6 @@ describe('DateSelectorComponent', () => {
     componentRef.setInput('selectedDate', '2026-04-24');
     componentRef.setInput('minDate', '2026-04-24');
     componentRef.setInput('maxDate', '2026-04-30');
-    componentRef.setInput('dateOptions', [
-      '2026-04-24',
-      '2026-04-25',
-      '2026-04-26',
-      '2026-04-27',
-      '2026-04-28',
-      '2026-04-29',
-      '2026-04-30',
-    ]);
   });
 
   it('should limit the date input to the allowed range', () => {

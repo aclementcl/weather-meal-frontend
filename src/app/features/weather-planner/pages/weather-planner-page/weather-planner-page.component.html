@@ -4,36 +4,47 @@
       <p class="eyebrow">WeatherMeal</p>
       <h1 id="app-title">Planifica tu menu segun el clima en Chile</h1>
       <p>
-        Selecciona una ciudad soportada para avanzar con el flujo del challenge.
+        Usamos tu ubicacion para sugerir la ciudad soportada mas cercana. Puedes cambiarla cuando quieras.
       </p>
     </div>
 
-    <app-location-selector
-      [locations]="locations()"
-      [selectedCity]="selectedCity()"
-      [isLoading]="isLoadingLocations()"
-      [errorMessage]="locationError()"
-      (selectedCityChange)="onCityChange($event)"
-    />
+    <section class="planner-panel" aria-label="Planificador">
+      <div class="planner-header">
+        <span class="section-label">Plan</span>
+        <h2>Datos del dia</h2>
+      </div>
 
-    <app-date-selector
-      [selectedDate]="selectedDate()"
-      [minDate]="minDate"
-      [maxDate]="maxDate"
-      [dateOptions]="dateOptions"
-      (selectedDateChange)="onDateChange($event)"
-    />
+      <div class="planner-fields">
+        <app-location-selector
+          [regions]="regions()"
+          [locations]="locations()"
+          [selectedRegionId]="selectedRegionId()"
+          [selectedCity]="selectedCity()"
+          [isLoading]="isLoadingLocations()"
+          [errorMessage]="locationError()"
+          (selectedRegionChange)="onRegionChange($event)"
+          (selectedCityChange)="onCityChange($event)"
+        />
+
+        <app-date-selector
+          [selectedDate]="selectedDate()"
+          [minDate]="minDate"
+          [maxDate]="maxDate"
+          (selectedDateChange)="onDateChange($event)"
+        />
+      </div>
+
+      <app-preferences-selector
+        [options]="preferenceOptions"
+        [selectedPreferences]="selectedPreferences()"
+        (selectedPreferencesChange)="onPreferencesChange($event)"
+      />
+    </section>
 
     <app-weather-summary
       [weather]="weather()"
       [isLoading]="isLoadingWeather()"
       [errorMessage]="weatherError()"
-    />
-
-    <app-preferences-selector
-      [options]="preferenceOptions"
-      [selectedPreferences]="selectedPreferences()"
-      (selectedPreferencesChange)="onPreferencesChange($event)"
     />
 
     <app-menu-suggestion
@@ -43,30 +54,5 @@
       [canRequest]="canRequestMenu()"
       (requestMenu)="suggestMenu()"
     />
-
-    @if (selectedLocation(); as location) {
-      <section class="selected-location" aria-label="Ciudad seleccionada">
-        <div>
-          <span class="section-label">Busqueda seleccionada</span>
-          <h2>{{ location.name }}</h2>
-          <p>{{ location.region }}</p>
-        </div>
-
-        <dl>
-          <div>
-            <dt>Fecha</dt>
-            <dd>{{ selectedDate() }}</dd>
-          </div>
-          <div>
-            <dt>Latitud</dt>
-            <dd>{{ location.latitude }}</dd>
-          </div>
-          <div>
-            <dt>Longitud</dt>
-            <dd>{{ location.longitude }}</dd>
-          </div>
-        </dl>
-      </section>
-    }
   </section>
 </main>

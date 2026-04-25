@@ -18,11 +18,20 @@ describe('LocationSelectorComponent', () => {
   it('should render locations as select options', () => {
     componentRef.setInput('isLoading', false);
     componentRef.setInput('errorMessage', '');
+    componentRef.setInput('selectedRegionId', 'metropolitana-de-santiago');
     componentRef.setInput('selectedCity', 'Santiago');
+    componentRef.setInput('regions', [
+      {
+        id: 'metropolitana-de-santiago',
+        name: 'Metropolitana de Santiago',
+      },
+    ]);
     componentRef.setInput('locations', [
       {
+        id: 'santiago',
         name: 'Santiago',
-        region: 'Metropolitana de Santiago',
+        regionId: 'metropolitana-de-santiago',
+        regionName: 'Metropolitana de Santiago',
         latitude: -33.4489,
         longitude: -70.6693,
       },

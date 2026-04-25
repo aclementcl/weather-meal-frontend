@@ -1,8 +1,7 @@
 .weather-panel {
-  background: rgba(255, 255, 255, 0.82);
-  border: 1px solid rgba(24, 33, 31, 0.12);
+  background: #ffffff;
+  border: 1px solid #e4e7e5;
   border-radius: 8px;
-  box-shadow: 0 20px 60px rgba(24, 33, 31, 0.08);
   display: grid;
   gap: 18px;
   padding: 20px;
@@ -10,7 +9,7 @@
 
 .section-label {
   color: #0f766e;
-  font-size: 0.78rem;
+  font-size: 0.75rem;
   font-weight: 700;
   letter-spacing: 0;
   margin: 0 0 8px;
@@ -24,7 +23,7 @@ dl {
 }
 
 h2 {
-  font-size: 1.35rem;
+  font-size: 1.2rem;
   line-height: 1.1;
 }
 
@@ -38,13 +37,13 @@ h2 {
 }
 
 .weather-state {
-  background: rgba(15, 118, 110, 0.08);
-  color: #51615d;
+  background: #f3f6f5;
+  color: #66706d;
 }
 
 .error-message {
-  background: rgba(185, 28, 28, 0.08);
-  color: #991b1b;
+  background: #fff5f5;
+  color: #b42318;
 }
 
 .forecast {
@@ -60,7 +59,7 @@ h2 {
 
 .weather-icon {
   align-items: center;
-  background: #f48442;
+  background: #17201d;
   border-radius: 50%;
   color: #ffffff;
   display: flex;
@@ -73,14 +72,14 @@ h2 {
 }
 
 .description {
-  color: #18211f;
-  font-size: 1.45rem;
+  color: #17201d;
+  font-size: 1.3rem;
   font-weight: 800;
   line-height: 1.1;
 }
 
 .context {
-  color: #51615d;
+  color: #66706d;
   margin-top: 6px;
 }
 
@@ -91,22 +90,22 @@ dl {
 }
 
 dl div {
-  background: rgba(15, 118, 110, 0.08);
+  background: #f7f8f7;
   border-radius: 6px;
   padding: 14px;
 }
 
 dt {
-  color: #51615d;
-  font-size: 0.78rem;
+  color: #66706d;
+  font-size: 0.75rem;
   font-weight: 700;
   margin-bottom: 6px;
   text-transform: uppercase;
 }
 
 dd {
-  color: #18211f;
-  font-size: 1.55rem;
+  color: #17201d;
+  font-size: 1.35rem;
   font-weight: 800;
   margin: 0;
 }

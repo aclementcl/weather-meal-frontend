@@ -13,11 +13,20 @@ describe('WeatherPlannerPageComponent', () => {
         {
           provide: LocationsApiService,
           useValue: {
-            getLocations: () =>
+            getRegions: () =>
               of([
                 {
+                  id: 'metropolitana-de-santiago',
+                  name: 'Metropolitana de Santiago',
+                },
+              ]),
+            getCities: () =>
+              of([
+                {
+                  id: 'santiago',
                   name: 'Santiago',
-                  region: 'Metropolitana de Santiago',
+                  regionId: 'metropolitana-de-santiago',
+                  regionName: 'Metropolitana de Santiago',
                   latitude: -33.4489,
                   longitude: -70.6693,
                 },
@@ -50,8 +59,10 @@ describe('WeatherPlannerPageComponent', () => {
             getWeather: () =>
               of({
                 location: {
+                  id: 'santiago',
                   name: 'Santiago',
-                  region: 'Metropolitana de Santiago',
+                  regionId: 'metropolitana-de-santiago',
+                  regionName: 'Metropolitana de Santiago',
                   latitude: -33.4489,
                   longitude: -70.6693,
                 },
@@ -69,7 +80,7 @@ describe('WeatherPlannerPageComponent', () => {
     }).compileComponents();
   });
 
-  it('should render the WeatherMeal title and selected location', () => {
+  it('should render the planning flow', () => {
     const fixture = TestBed.createComponent(WeatherPlannerPageComponent);
     fixture.detectChanges();
 
@@ -77,13 +88,9 @@ describe('WeatherPlannerPageComponent', () => {
     expect(compiled.querySelector('h1')?.textContent).toContain(
       'Planifica tu menu segun el clima en Chile',
     );
-    expect(compiled.querySelector('.selected-location h2')?.textContent).toContain(
-      'Santiago',
-    );
+    expect(compiled.querySelector('.planner-panel')).toBeTruthy();
+    expect(compiled.querySelector('.selected-location')).toBeFalsy();
     expect(compiled.querySelector('input[type="date"]')).toBeTruthy();
-    expect(compiled.querySelector('.selected-location')?.textContent).toContain(
-      new Date().getFullYear().toString(),
-    );
     expect(compiled.querySelector('app-weather-summary')?.textContent).toContain(
       'Clear sky',
     );

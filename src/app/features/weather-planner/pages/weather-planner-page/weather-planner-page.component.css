@@ -1,5 +1,5 @@
 :host {
-  color: #18211f;
+  color: #17201d;
   display: block;
   font-family:
     Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
@@ -8,19 +8,16 @@
 }
 
 .app-shell {
-  background:
-    linear-gradient(135deg, rgba(244, 132, 66, 0.16), transparent 32%),
-    linear-gradient(220deg, rgba(27, 122, 118, 0.16), transparent 38%),
-    #f7f3eb;
+  background: #fafafa;
   min-height: 100vh;
-  padding: 48px 20px;
+  padding: 40px 20px;
 }
 
 .workspace {
   display: grid;
-  gap: 24px;
+  gap: 18px;
   margin: 0 auto;
-  max-width: 920px;
+  max-width: 880px;
 }
 
 .intro {
@@ -30,10 +27,10 @@
 .eyebrow,
 .section-label {
   color: #0f766e;
-  font-size: 0.78rem;
+  font-size: 0.75rem;
   font-weight: 700;
   letter-spacing: 0;
-  margin: 0 0 10px;
+  margin: 0 0 8px;
   text-transform: uppercase;
 }
 
@@ -44,59 +41,36 @@ p {
 }
 
 h1 {
-  font-size: clamp(2rem, 5vw, 4rem);
-  line-height: 1;
-  max-width: 760px;
+  font-size: clamp(2rem, 4vw, 3.25rem);
+  line-height: 1.05;
+  max-width: 720px;
 }
 
 .intro p:not(.eyebrow) {
-  color: #51615d;
-  font-size: 1.05rem;
-  line-height: 1.6;
-  margin-top: 18px;
-}
-
-.selected-location {
-  background: rgba(255, 255, 255, 0.82);
-  border: 1px solid rgba(24, 33, 31, 0.12);
-  border-radius: 8px;
-  box-shadow: 0 20px 60px rgba(24, 33, 31, 0.08);
-  display: grid;
-  gap: 22px;
-  grid-template-columns: minmax(0, 1fr) auto;
-  padding: 24px;
-}
-
-.selected-location h2 {
-  font-size: clamp(1.6rem, 4vw, 2.4rem);
-  line-height: 1.05;
-}
-
-.selected-location p {
-  color: #51615d;
-  margin-top: 8px;
-}
-
-dl {
-  display: grid;
-  gap: 12px;
-  grid-template-columns: repeat(3, minmax(110px, 1fr));
-  margin: 0;
-}
-
-dt {
-  color: #51615d;
-  font-size: 0.78rem;
-  font-weight: 700;
-  margin-bottom: 4px;
-  text-transform: uppercase;
-}
-
-dd {
-  color: #18211f;
+  color: #66706d;
   font-size: 1rem;
-  font-weight: 700;
-  margin: 0;
+  line-height: 1.55;
+  margin-top: 12px;
+}
+
+.planner-panel {
+  background: #ffffff;
+  border: 1px solid #e4e7e5;
+  border-radius: 8px;
+  display: grid;
+  gap: 16px;
+  padding: 20px;
+}
+
+.planner-header h2 {
+  font-size: 1.2rem;
+  line-height: 1.1;
+}
+
+.planner-fields {
+  display: grid;
+  gap: 14px;
+  grid-template-columns: minmax(0, 1.1fr) minmax(260px, 0.9fr);
 }
 
 @media (max-width: 680px) {
@@ -104,8 +78,7 @@ dd {
     padding: 32px 16px;
   }
 
-  .selected-location,
-  dl {
+  .planner-fields {
     grid-template-columns: 1fr;
   }
 }

@@ -1,7 +1,7 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { Location } from '../models/location.model';
+import { Location, Region } from '../models/location.model';
 
 @Injectable({
   providedIn: 'root',
@@ -9,7 +9,15 @@ import { Location } from '../models/location.model';
 export class LocationsApiService {
   constructor(private readonly http: HttpClient) {}
 
-  getLocations(): Observable<Location[]> {
-    return this.http.get<Location[]>('/api/v1/locations/chile');
+  getRegions(): Observable<Region[]> {
+    return this.http.get<Region[]>('/api/v1/locations/chile/regions');
+  }
+
+  getCities(regionId?: string): Observable<Location[]> {
+    const options = regionId
+      ? { params: new HttpParams().set('regionId', regionId) }
+      : undefined;
+
+    return this.http.get<Location[]>('/api/v1/locations/chile/cities', options);
   }
 }
