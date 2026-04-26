@@ -50,9 +50,21 @@
     <app-menu-suggestion
       [menuSuggestion]="menuSuggestion()"
       [isLoading]="isLoadingMenu()"
+      [isSavingFavorite]="isSavingFavorite()"
       [errorMessage]="menuError()"
+      [favoriteMessage]="favoriteMessage()"
+      [favoriteErrorMessage]="favoriteError()"
       [canRequest]="canRequestMenu()"
       (requestMenu)="suggestMenu()"
+      (saveFavorite)="saveFavorite()"
+    />
+
+    <app-favorites-list
+      [favorites]="favorites()"
+      [isLoading]="isLoadingFavorites()"
+      [deletingFavoriteId]="deletingFavoriteId()"
+      [errorMessage]="favoritesError()"
+      (deleteFavorite)="deleteFavorite($event)"
     />
   </section>
 </main>

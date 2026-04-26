@@ -1,0 +1,56 @@
+<section class="favorites-panel" aria-labelledby="favorites-title">
+  <div class="panel-heading">
+    <div>
+      <span class="section-label">Favoritos</span>
+      <h2 id="favorites-title">Mi recetario personal</h2>
+    </div>
+  </div>
+
+  @if (isLoading()) {
+    <div class="favorites-state">Cargando favoritos...</div>
+  } @else if (errorMessage()) {
+    <p class="error-message" role="alert">{{ errorMessage() }}</p>
+  } @else if (favorites().length === 0) {
+    <div class="favorites-state">Guarda un menú para consultarlo más tarde.</div>
+  } @else {
+    <div class="favorites-list">
+      @for (favorite of favorites(); track favorite.id) {
+        <article>
+          <div class="favorite-header">
+            <div>
+              <h3>{{ favorite.location }}</h3>
+              <p>{{ favorite.date }} · {{ favorite.weather.summary }}</p>
+            </div>
+
+            <button
+              type="button"
+              [disabled]="deletingFavoriteId() === favorite.id"
+              (click)="deleteFavorite.emit(favorite.id)"
+            >
+              {{
+                deletingFavoriteId() === favorite.id
+                  ? 'Eliminando...'
+                  : 'Eliminar'
+              }}
+            </button>
+          </div>
+
+          <dl>
+            <div>
+              <dt>Desayuno</dt>
+              <dd>{{ favorite.menu.breakfast }}</dd>
+            </div>
+            <div>
+              <dt>Almuerzo</dt>
+              <dd>{{ favorite.menu.lunch }}</dd>
+            </div>
+            <div>
+              <dt>Cena</dt>
+              <dd>{{ favorite.menu.dinner }}</dd>
+            </div>
+          </dl>
+        </article>
+      }
+    </div>
+  }
+</section>

@@ -1,5 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 import { of } from 'rxjs';
+import { FavoritesApiService } from '../../../../core/services/favorites-api.service';
 import { LocationsApiService } from '../../../../core/services/locations-api.service';
 import { MenuApiService } from '../../../../core/services/menu-api.service';
 import { WeatherApiService } from '../../../../core/services/weather-api.service';
@@ -10,6 +11,14 @@ describe('WeatherPlannerPageComponent', () => {
     await TestBed.configureTestingModule({
       imports: [WeatherPlannerPageComponent],
       providers: [
+        {
+          provide: FavoritesApiService,
+          useValue: {
+            getFavorites: () => of([]),
+            saveFavorite: () => of({}),
+            deleteFavorite: () => of(undefined),
+          },
+        },
         {
           provide: LocationsApiService,
           useValue: {

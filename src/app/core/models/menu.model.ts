@@ -21,3 +21,7 @@ export interface MenuSuggestResponse {
   weather: MenuWeatherSummary;
   menu: MenuSuggestion;
 }
+
+export interface FavoriteMenu extends MenuSuggestResponse {
+  id: number;
+}

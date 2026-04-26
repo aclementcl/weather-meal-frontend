@@ -1,12 +1,17 @@
 import { Component, OnInit, computed, signal } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
 import { Location, Region } from '../../../../core/models/location.model';
-import { MenuSuggestResponse } from '../../../../core/models/menu.model';
+import {
+  FavoriteMenu,
+  MenuSuggestResponse,
+} from '../../../../core/models/menu.model';
+import { FavoritesApiService } from '../../../../core/services/favorites-api.service';
 import { WeatherResponse } from '../../../../core/models/weather.model';
 import { LocationsApiService } from '../../../../core/services/locations-api.service';
 import { MenuApiService } from '../../../../core/services/menu-api.service';
 import { WeatherApiService } from '../../../../core/services/weather-api.service';
 import { DateSelectorComponent } from '../../components/date-selector/date-selector.component';
+import { FavoritesListComponent } from '../../components/favorites-list/favorites-list.component';
 import { LocationSelectorComponent } from '../../components/location-selector/location-selector.component';
 import { MenuSuggestionComponent } from '../../components/menu-suggestion/menu-suggestion.component';
 import { PreferencesSelectorComponent } from '../../components/preferences-selector/preferences-selector.component';
@@ -17,6 +22,7 @@ import { WeatherSummaryComponent } from '../../components/weather-summary/weathe
   selector: 'app-weather-planner-page',
   imports: [
     DateSelectorComponent,
+    FavoritesListComponent,
     LocationSelectorComponent,
     MenuSuggestionComponent,
     PreferencesSelectorComponent,
@@ -46,10 +52,17 @@ export class WeatherPlannerPageComponent implements OnInit {
   protected readonly menuSuggestion = signal<MenuSuggestResponse | undefined>(
     undefined,
   );
+  protected readonly favorites = signal<FavoriteMenu[]>([]);
   protected readonly weather = signal<WeatherResponse | undefined>(undefined);
+  protected readonly deletingFavoriteId = signal<number | undefined>(undefined);
   protected readonly isLoadingLocations = signal(true);
+  protected readonly isLoadingFavorites = signal(false);
   protected readonly isLoadingMenu = signal(false);
+  protected readonly isSavingFavorite = signal(false);
   protected readonly isLoadingWeather = signal(false);
+  protected readonly favoritesError = signal('');
+  protected readonly favoriteMessage = signal('');
+  protected readonly favoriteError = signal('');
   protected readonly locationError = signal('');
   protected readonly menuError = signal('');
   protected readonly weatherError = signal('');
@@ -65,12 +78,15 @@ export class WeatherPlannerPageComponent implements OnInit {
   );
 
   constructor(
+    private readonly favoritesApi: FavoritesApiService,
     private readonly locationsApi: LocationsApiService,
     private readonly menuApi: MenuApiService,
     private readonly weatherApi: WeatherApiService,
   ) {}
 
   ngOnInit(): void {
+    this.loadFavorites();
+
     this.locationsApi.getRegions().subscribe({
       next: (regions) => {
         this.regions.set(regions);
@@ -277,6 +293,8 @@ export class WeatherPlannerPageComponent implements OnInit {
           }
 
           this.menuSuggestion.set(menuSuggestion);
+          this.favoriteMessage.set('');
+          this.favoriteError.set('');
           this.isLoadingMenu.set(false);
         },
         error: (error: unknown) => {
@@ -289,6 +307,52 @@ export class WeatherPlannerPageComponent implements OnInit {
           this.isLoadingMenu.set(false);
         },
       });
+  }
+
+  protected saveFavorite(): void {
+    const menuSuggestion = this.menuSuggestion();
+
+    if (!menuSuggestion || this.isSavingFavorite()) {
+      return;
+    }
+
+    this.isSavingFavorite.set(true);
+    this.favoriteMessage.set('');
+    this.favoriteError.set('');
+
+    this.favoritesApi.saveFavorite(menuSuggestion).subscribe({
+      next: (favorite) => {
+        this.favorites.update((favorites) => [favorite, ...favorites]);
+        this.favoriteMessage.set('Menú guardado en favoritos.');
+        this.isSavingFavorite.set(false);
+      },
+      error: () => {
+        this.favoriteError.set('No se pudo guardar el menú en favoritos.');
+        this.isSavingFavorite.set(false);
+      },
+    });
+  }
+
+  protected deleteFavorite(favoriteId: number): void {
+    if (this.deletingFavoriteId() !== undefined) {
+      return;
+    }
+
+    this.deletingFavoriteId.set(favoriteId);
+    this.favoritesError.set('');
+
+    this.favoritesApi.deleteFavorite(favoriteId).subscribe({
+      next: () => {
+        this.favorites.update((favorites) =>
+          favorites.filter((favorite) => favorite.id !== favoriteId),
+        );
+        this.deletingFavoriteId.set(undefined);
+      },
+      error: () => {
+        this.favoritesError.set('No se pudo eliminar el favorito seleccionado.');
+        this.deletingFavoriteId.set(undefined);
+      },
+    });
   }
 
   private loadWeather(): void {
@@ -330,7 +394,25 @@ export class WeatherPlannerPageComponent implements OnInit {
     this.menuRequestId++;
     this.menuSuggestion.set(undefined);
     this.menuError.set('');
+    this.favoriteMessage.set('');
+    this.favoriteError.set('');
     this.isLoadingMenu.set(false);
+  }
+
+  private loadFavorites(): void {
+    this.isLoadingFavorites.set(true);
+    this.favoritesError.set('');
+
+    this.favoritesApi.getFavorites().subscribe({
+      next: (favorites) => {
+        this.favorites.set(favorites);
+        this.isLoadingFavorites.set(false);
+      },
+      error: () => {
+        this.favoritesError.set('No se pudo cargar tu recetario personal.');
+        this.isLoadingFavorites.set(false);
+      },
+    });
   }
 
   private selectCity(location?: Location): void {

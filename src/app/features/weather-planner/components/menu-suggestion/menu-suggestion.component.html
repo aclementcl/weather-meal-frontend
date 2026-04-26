@@ -5,13 +5,26 @@
       <h2 id="menu-title">Sugerencia del día</h2>
     </div>
 
-    <button
-      type="button"
-      [disabled]="!canRequest() || isLoading()"
-      (click)="requestMenu.emit()"
-    >
-      {{ isLoading() ? 'Generando...' : 'Sugerir menú' }}
-    </button>
+    <div class="panel-actions">
+      @if (menuSuggestion()) {
+        <button
+          class="secondary-action"
+          type="button"
+          [disabled]="isSavingFavorite() || isLoading()"
+          (click)="saveFavorite.emit()"
+        >
+          {{ isSavingFavorite() ? 'Guardando...' : 'Guardar' }}
+        </button>
+      }
+
+      <button
+        type="button"
+        [disabled]="!canRequest() || isLoading()"
+        (click)="requestMenu.emit()"
+      >
+        {{ isLoading() ? 'Generando...' : 'Sugerir menú' }}
+      </button>
+    </div>
   </div>
 
   @if (menuSuggestion(); as suggestion) {
@@ -34,6 +47,12 @@
           <p>{{ suggestion.menu.dinner }}</p>
         </article>
       </div>
+
+      @if (favoriteMessage()) {
+        <p class="success-message" role="status">{{ favoriteMessage() }}</p>
+      } @else if (favoriteErrorMessage()) {
+        <p class="error-message" role="alert">{{ favoriteErrorMessage() }}</p>
+      }
     }
   } @else {
     @if (isLoading()) {
