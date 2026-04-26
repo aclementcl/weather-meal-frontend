@@ -12,7 +12,13 @@ import {
 export class MenuApiService {
   constructor(private readonly http: HttpClient) {}
 
-  suggestMenu(request: MenuSuggestRequest): Observable<MenuSuggestResponse> {
-    return this.http.post<MenuSuggestResponse>('/api/v1/menu/suggest', request);
+  suggestMenu(
+    cityId: number,
+    request: MenuSuggestRequest,
+  ): Observable<MenuSuggestResponse> {
+    return this.http.post<MenuSuggestResponse>(
+      `/api/v1/locations/chile/cities/${cityId}/menu-suggestions`,
+      request,
+    );
   }
 }

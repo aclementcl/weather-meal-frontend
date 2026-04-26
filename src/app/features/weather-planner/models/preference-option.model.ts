@@ -1,4 +1,4 @@
 export interface PreferenceOption {
-  value: string;
+  id: number;
   label: string;
 }

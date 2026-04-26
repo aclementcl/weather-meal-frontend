@@ -1,4 +1,5 @@
 import { Component, OnInit, computed, signal } from '@angular/core';
+import { HttpErrorResponse } from '@angular/common/http';
 import { Location, Region } from '../../../../core/models/location.model';
 import { MenuSuggestResponse } from '../../../../core/models/menu.model';
 import { WeatherResponse } from '../../../../core/models/weather.model';
@@ -32,15 +33,16 @@ export class WeatherPlannerPageComponent implements OnInit {
   protected readonly locations = signal<Location[]>([]);
   protected readonly regions = signal<Region[]>([]);
   protected readonly preferenceOptions: PreferenceOption[] = [
-    { value: 'vegetarian', label: 'Vegetariano' },
-    { value: 'gluten-free', label: 'Sin gluten' },
-    { value: 'dairy-free', label: 'Sin lacteos' },
-    { value: 'high-protein', label: 'Alto en proteina' },
+    { id: 1, label: 'Vegetariano' },
+    { id: 2, label: 'Sin gluten' },
+    { id: 3, label: 'Sin lácteos' },
+    { id: 4, label: 'Alto en proteína' },
   ];
   protected readonly selectedCity = signal('');
+  protected readonly selectedCityId = signal<number | undefined>(undefined);
   protected readonly selectedDate = signal(this.today);
-  protected readonly selectedPreferences = signal<string[]>([]);
-  protected readonly selectedRegionId = signal('');
+  protected readonly selectedPreferenceIds = signal<number[]>([]);
+  protected readonly selectedRegionId = signal<number | undefined>(undefined);
   protected readonly menuSuggestion = signal<MenuSuggestResponse | undefined>(
     undefined,
   );
@@ -56,7 +58,7 @@ export class WeatherPlannerPageComponent implements OnInit {
   protected readonly maxDate = this.dateOptions[this.dateOptions.length - 1];
 
   protected readonly selectedLocation = computed(() =>
-    this.locations().find((location) => location.name === this.selectedCity()),
+    this.locations().find((location) => location.id === this.selectedCityId()),
   );
   protected readonly canRequestMenu = computed(
     () => !!this.weather() && !this.isLoadingWeather(),
@@ -76,24 +78,28 @@ export class WeatherPlannerPageComponent implements OnInit {
       },
       error: () => {
         this.locationError.set(
-          'No se pudo cargar el listado de regiones. Revisa que el backend Nest este corriendo.',
+          'No se pudo cargar el listado de regiones. Revisa que el backend Nest esté corriendo.',
         );
         this.isLoadingLocations.set(false);
       },
     });
   }
 
-  protected onRegionChange(regionId: string): void {
+  protected onRegionChange(regionId: number): void {
     this.selectedRegionId.set(regionId);
     this.selectedCity.set('');
+    this.selectedCityId.set(undefined);
     this.weather.set(undefined);
     this.weatherError.set('');
     this.resetMenuSuggestion();
     this.loadCities(regionId);
   }
 
-  protected onCityChange(city: string): void {
-    this.selectedCity.set(city);
+  protected onCityChange(cityId: number): void {
+    const location = this.locations().find((item) => item.id === cityId);
+
+    this.selectedCity.set(location?.name ?? '');
+    this.selectedCityId.set(location?.id);
     this.resetMenuSuggestion();
     this.loadWeather();
   }
@@ -126,7 +132,7 @@ export class WeatherPlannerPageComponent implements OnInit {
     this.isLoadingLocations.set(true);
     this.locationError.set('');
 
-    this.locationsApi.getCities().subscribe({
+    this.locationsApi.getAllCities(this.regions()).subscribe({
       next: (locations) => {
         const nearestLocation = this.findNearestLocation(
           latitude,
@@ -149,21 +155,26 @@ export class WeatherPlannerPageComponent implements OnInit {
   }
 
   private loadFallbackCities(): void {
-    this.selectedRegionId.set(this.regions()[0]?.id ?? '');
-    this.loadCities(this.selectedRegionId());
+    this.selectedRegionId.set(this.regions()[0]?.id);
+
+    if (this.selectedRegionId() === undefined) {
+      this.isLoadingLocations.set(false);
+      return;
+    }
+
+    this.loadCities(this.selectedRegionId() as number);
   }
 
-  private loadCities(regionId: string, preferredCity?: string): void {
+  private loadCities(regionId: number, preferredCity?: string): void {
     this.isLoadingLocations.set(true);
     this.locationError.set('');
 
     this.locationsApi.getCities(regionId).subscribe({
       next: (locations) => {
         this.locations.set(locations);
-        this.selectedCity.set(
-          locations.find((location) => location.name === preferredCity)?.name ??
-            locations[0]?.name ??
-            '',
+        this.selectCity(
+          locations.find((location) => location.name === preferredCity) ??
+            locations[0],
         );
         this.isLoadingLocations.set(false);
         this.resetMenuSuggestion();
@@ -172,9 +183,10 @@ export class WeatherPlannerPageComponent implements OnInit {
       error: () => {
         this.locations.set([]);
         this.selectedCity.set('');
+        this.selectedCityId.set(undefined);
         this.weather.set(undefined);
         this.locationError.set(
-          'No se pudo cargar el listado de ciudades para la region seleccionada.',
+          'No se pudo cargar el listado de ciudades para la región seleccionada.',
         );
         this.isLoadingLocations.set(false);
       },
@@ -237,16 +249,16 @@ export class WeatherPlannerPageComponent implements OnInit {
     this.loadWeather();
   }
 
-  protected onPreferencesChange(preferences: string[]): void {
-    this.selectedPreferences.set(preferences);
+  protected onPreferencesChange(preferenceIds: number[]): void {
+    this.selectedPreferenceIds.set(preferenceIds);
     this.resetMenuSuggestion();
   }
 
   protected suggestMenu(): void {
-    const city = this.selectedCity();
+    const cityId = this.selectedCityId();
     const requestId = ++this.menuRequestId;
 
-    if (!city || !this.weather()) {
+    if (cityId === undefined || !this.weather()) {
       return;
     }
 
@@ -254,10 +266,9 @@ export class WeatherPlannerPageComponent implements OnInit {
     this.menuError.set('');
 
     this.menuApi
-      .suggestMenu({
-        location: city,
+      .suggestMenu(cityId, {
         date: this.selectedDate(),
-        preferences: this.selectedPreferences(),
+        preferenceIds: this.selectedPreferenceIds(),
       })
       .subscribe({
         next: (menuSuggestion) => {
@@ -268,25 +279,23 @@ export class WeatherPlannerPageComponent implements OnInit {
           this.menuSuggestion.set(menuSuggestion);
           this.isLoadingMenu.set(false);
         },
-        error: () => {
+        error: (error: unknown) => {
           if (requestId !== this.menuRequestId) {
             return;
           }
 
           this.menuSuggestion.set(undefined);
-          this.menuError.set(
-            'No se pudo generar una sugerencia de menu para este clima.',
-          );
+          this.menuError.set(this.getMenuErrorMessage(error));
           this.isLoadingMenu.set(false);
         },
       });
   }
 
   private loadWeather(): void {
-    const city = this.selectedCity();
+    const cityId = this.selectedCityId();
     const requestId = ++this.weatherRequestId;
 
-    if (!city) {
+    if (cityId === undefined) {
       this.weather.set(undefined);
       return;
     }
@@ -294,7 +303,7 @@ export class WeatherPlannerPageComponent implements OnInit {
     this.isLoadingWeather.set(true);
     this.weatherError.set('');
 
-    this.weatherApi.getWeather(city, this.selectedDate()).subscribe({
+    this.weatherApi.getWeather(cityId, this.selectedDate()).subscribe({
       next: (weather) => {
         if (requestId !== this.weatherRequestId) {
           return;
@@ -322,6 +331,24 @@ export class WeatherPlannerPageComponent implements OnInit {
     this.menuSuggestion.set(undefined);
     this.menuError.set('');
     this.isLoadingMenu.set(false);
+  }
+
+  private selectCity(location?: Location): void {
+    this.selectedCity.set(location?.name ?? '');
+    this.selectedCityId.set(location?.id);
+  }
+
+  private getMenuErrorMessage(error: unknown): string {
+    if (error instanceof HttpErrorResponse) {
+      const backendMessage =
+        typeof error.error?.message === 'string' ? error.error.message : '';
+
+      if (backendMessage) {
+        return `No se pudo generar el menú: ${backendMessage}.`;
+      }
+    }
+
+    return 'No se pudo generar una sugerencia de menú para este clima.';
   }
 
   private buildDateOptions(): string[] {

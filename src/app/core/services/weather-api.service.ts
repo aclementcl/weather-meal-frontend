@@ -9,9 +9,12 @@ import { WeatherResponse } from '../models/weather.model';
 export class WeatherApiService {
   constructor(private readonly http: HttpClient) {}
 
-  getWeather(city: string, date: string): Observable<WeatherResponse> {
-    const params = new HttpParams().set('city', city).set('date', date);
+  getWeather(cityId: number, date: string): Observable<WeatherResponse> {
+    const params = new HttpParams().set('date', date);
 
-    return this.http.get<WeatherResponse>('/api/v1/weather', { params });
+    return this.http.get<WeatherResponse>(
+      `/api/v1/locations/chile/cities/${cityId}/weather`,
+      { params },
+    );
   }
 }

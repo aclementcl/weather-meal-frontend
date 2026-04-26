@@ -1,12 +1,12 @@
 export interface Region {
-  id: string;
+  id: number;
   name: string;
 }
 
 export interface Location {
-  id: string;
+  id: number;
   name: string;
-  regionId: string;
+  regionId: number;
   regionName: string;
   latitude: number;
   longitude: number;

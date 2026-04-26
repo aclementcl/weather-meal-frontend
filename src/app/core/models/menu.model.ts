@@ -11,9 +11,8 @@ export interface MenuWeatherSummary {
 }
 
 export interface MenuSuggestRequest {
-  location: string;
   date: string;
-  preferences: string[];
+  preferenceIds: number[];
 }
 
 export interface MenuSuggestResponse {

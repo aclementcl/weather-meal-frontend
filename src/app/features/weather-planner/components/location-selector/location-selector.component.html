@@ -5,7 +5,7 @@
     <p class="error-message" role="alert">{{ errorMessage() }}</p>
   } @else {
     <div class="field">
-      <label for="region">Region</label>
+      <label for="region">Región</label>
       <select
         id="region"
         name="region"
@@ -13,7 +13,7 @@
         (ngModelChange)="selectedRegionChange.emit($event)"
       >
         @for (region of regions(); track region.id) {
-          <option [value]="region.id">{{ region.name }}</option>
+          <option [ngValue]="region.id">{{ region.name }}</option>
         }
       </select>
     </div>
@@ -23,11 +23,11 @@
       <select
         id="city"
         name="city"
-        [ngModel]="selectedCity()"
+        [ngModel]="selectedCityId()"
         (ngModelChange)="selectedCityChange.emit($event)"
       >
         @for (location of locations(); track location.id) {
-          <option [value]="location.name">{{ location.name }}</option>
+          <option [ngValue]="location.id">{{ location.name }}</option>
         }
       </select>
     </div>

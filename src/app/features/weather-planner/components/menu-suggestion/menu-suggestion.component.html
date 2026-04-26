@@ -2,7 +2,7 @@
   <div class="panel-heading">
     <div>
       <span class="section-label">Menu</span>
-      <h2 id="menu-title">Sugerencia del dia</h2>
+      <h2 id="menu-title">Sugerencia del día</h2>
     </div>
 
     <button
@@ -10,7 +10,7 @@
       [disabled]="!canRequest() || isLoading()"
       (click)="requestMenu.emit()"
     >
-      {{ isLoading() ? 'Generando...' : 'Sugerir menu' }}
+      {{ isLoading() ? 'Generando...' : 'Sugerir menú' }}
     </button>
   </div>
 
@@ -41,7 +41,7 @@
     } @else if (errorMessage()) {
       <p class="error-message" role="alert">{{ errorMessage() }}</p>
     } @else {
-      <div class="menu-state">Genera una sugerencia cuando el clima este listo.</div>
+      <div class="menu-state">Genera una sugerencia cuando el clima esté listo.</div>
     }
   }
 </section>

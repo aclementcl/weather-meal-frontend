@@ -8,22 +8,22 @@ import { PreferenceOption } from '../../models/preference-option.model';
 })
 export class PreferencesSelectorComponent {
   readonly options = input.required<PreferenceOption[]>();
-  readonly selectedPreferences = input.required<string[]>();
-  readonly selectedPreferencesChange = output<string[]>();
+  readonly selectedPreferenceIds = input.required<number[]>();
+  readonly selectedPreferenceIdsChange = output<number[]>();
 
-  protected isSelected(value: string): boolean {
-    return this.selectedPreferences().includes(value);
+  protected isSelected(preferenceId: number): boolean {
+    return this.selectedPreferenceIds().includes(preferenceId);
   }
 
-  protected togglePreference(value: string, checked: boolean): void {
-    const selected = new Set(this.selectedPreferences());
+  protected togglePreference(preferenceId: number, checked: boolean): void {
+    const selected = new Set(this.selectedPreferenceIds());
 
     if (checked) {
-      selected.add(value);
+      selected.add(preferenceId);
     } else {
-      selected.delete(value);
+      selected.delete(preferenceId);
     }
 
-    this.selectedPreferencesChange.emit([...selected]);
+    this.selectedPreferenceIdsChange.emit([...selected]);
   }
 }

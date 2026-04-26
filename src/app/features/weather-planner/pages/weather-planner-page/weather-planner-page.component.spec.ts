@@ -16,16 +16,16 @@ describe('WeatherPlannerPageComponent', () => {
             getRegions: () =>
               of([
                 {
-                  id: 'metropolitana-de-santiago',
+                  id: 7,
                   name: 'Metropolitana de Santiago',
                 },
               ]),
             getCities: () =>
               of([
                 {
-                  id: 'santiago',
+                  id: 13,
                   name: 'Santiago',
-                  regionId: 'metropolitana-de-santiago',
+                  regionId: 7,
                   regionName: 'Metropolitana de Santiago',
                   latitude: -33.4489,
                   longitude: -70.6693,
@@ -59,9 +59,9 @@ describe('WeatherPlannerPageComponent', () => {
             getWeather: () =>
               of({
                 location: {
-                  id: 'santiago',
+                  id: 13,
                   name: 'Santiago',
-                  regionId: 'metropolitana-de-santiago',
+                  regionId: 7,
                   regionName: 'Metropolitana de Santiago',
                   latitude: -33.4489,
                   longitude: -70.6693,
@@ -86,7 +86,7 @@ describe('WeatherPlannerPageComponent', () => {
 
     const compiled = fixture.nativeElement as HTMLElement;
     expect(compiled.querySelector('h1')?.textContent).toContain(
-      'Planifica tu menu segun el clima en Chile',
+      'Planifica tu menú según el clima en Chile',
     );
     expect(compiled.querySelector('.planner-panel')).toBeTruthy();
     expect(compiled.querySelector('.selected-location')).toBeFalsy();
@@ -95,7 +95,7 @@ describe('WeatherPlannerPageComponent', () => {
       'Clear sky',
     );
     expect(compiled.querySelector('app-menu-suggestion')?.textContent).toContain(
-      'Sugerir menu',
+      'Sugerir menú',
     );
     expect(
       compiled.querySelector('app-preferences-selector')?.textContent,

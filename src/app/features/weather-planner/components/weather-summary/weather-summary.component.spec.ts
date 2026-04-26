@@ -18,9 +18,9 @@ describe('WeatherSummaryComponent', () => {
   it('should render weather summary and temperatures', () => {
     componentRef.setInput('weather', {
       location: {
-        id: 'santiago',
+        id: 13,
         name: 'Santiago',
-        regionId: 'metropolitana-de-santiago',
+        regionId: 7,
         regionName: 'Metropolitana de Santiago',
         latitude: -33.4489,
         longitude: -70.6693,

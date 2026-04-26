@@ -14,10 +14,10 @@ describe('PreferencesSelectorComponent', () => {
     fixture = TestBed.createComponent(PreferencesSelectorComponent);
     componentRef = fixture.componentRef;
     componentRef.setInput('options', [
-      { value: 'vegetarian', label: 'Vegetariano' },
-      { value: 'gluten-free', label: 'Sin gluten' },
+      { id: 1, label: 'Vegetariano' },
+      { id: 2, label: 'Sin gluten' },
     ]);
-    componentRef.setInput('selectedPreferences', []);
+    componentRef.setInput('selectedPreferenceIds', []);
   });
 
   it('should render preference options', () => {
@@ -29,7 +29,7 @@ describe('PreferencesSelectorComponent', () => {
   });
 
   it('should emit selected preferences when checked', () => {
-    spyOn(fixture.componentInstance.selectedPreferencesChange, 'emit');
+    spyOn(fixture.componentInstance.selectedPreferenceIdsChange, 'emit');
     fixture.detectChanges();
 
     const checkbox = fixture.nativeElement.querySelector(
@@ -39,7 +39,7 @@ describe('PreferencesSelectorComponent', () => {
     checkbox.dispatchEvent(new Event('change'));
 
     expect(
-      fixture.componentInstance.selectedPreferencesChange.emit,
-    ).toHaveBeenCalledWith(['vegetarian']);
+      fixture.componentInstance.selectedPreferenceIdsChange.emit,
+    ).toHaveBeenCalledWith([1]);
   });
 });
