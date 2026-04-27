@@ -36,6 +36,24 @@ ng build
 
 This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
 
+## Docker
+
+Build the frontend image:
+
+```bash
+docker build -t weathermeal-frontend .
+```
+
+Run the container against a backend running on the host machine at port `3000`:
+
+```bash
+docker run --rm -p 8080:80 -e BACKEND_URL=http://host.docker.internal:3000 weathermeal-frontend
+```
+
+Open `http://localhost:8080/`.
+
+The container serves the Angular production build with Nginx. Requests to `/api/*` are proxied to `BACKEND_URL`, so the frontend continues consuming the backend through the same relative API paths used in local development.
+
 ## Running unit tests
 
 To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
