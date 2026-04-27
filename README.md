@@ -1,69 +1,187 @@
-# Frontend
+# WeatherMeal Frontend
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 19.2.15.
+La aplicación permite elegir una región y ciudad de Chile, seleccionar una fecha entre hoy y los próximos 6 días, consultar el clima, pedir una sugerencia de menú y guardar menús favoritos.
 
-## Development server
 
-To start a local development server, run:
+## Funcionalidades
 
-```bash
-ng serve
+- Selector de región y ciudad de Chile consumido desde el backend.
+- Ubicación inicial sugerida con geolocalización del navegador y fallback a la primera ciudad soportada.
+- Selector de fecha limitado al rango permitido por el challenge.
+- Consulta visual del pronóstico para ciudad y fecha.
+- Sugerencia de desayuno, almuerzo y cena generada por el backend.
+- Preferencias alimenticias opcionales.
+- Guardado, listado y eliminación de menús favoritos.
+- Frontend dockerizado y preparado para despliegue en servidor.
+
+## Decisiones Técnicas
+
+### Angular standalone
+
+Se usa Angular con componentes standalone para reducir boilerplate y mantener el proyecto simple. La aplicación está organizada por feature, no por capas técnicas globales.
+
+Estructura principal:
+
+```text
+src/app/
+  core/
+    models/
+    services/
+  features/
+    weather-planner/
+      components/
+      pages/
+      models/
 ```
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+### API propia como frontera
 
-## Code scaffolding
+El frontend no llama APIs externas directamente. Todas las operaciones pasan por el backend:
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
-
-```bash
-ng generate component component-name
+```text
+GET    /api/v1/locations/chile/regions
+GET    /api/v1/locations/chile/regions/:regionId/cities
+GET    /api/v1/locations/chile/cities/:cityId/weather?date=YYYY-MM-DD
+POST   /api/v1/locations/chile/cities/:cityId/menu-suggestions
+GET    /api/v1/favorites
+POST   /api/v1/favorites
+DELETE /api/v1/favorites/:id
 ```
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+Esto mantiene las llaves, proveedores externos y reglas de negocio fuera del navegador.
+
+### Proxy local y proxy productivo
+
+En desarrollo, Angular usa `proxy.conf.json` para reenviar `/api` al backend local. En producción, Nginx sirve el build estático y también proxyea `/api` hacia `BACKEND_URL`. Así el código del frontend siempre consume rutas relativas y no depende de una URL hardcodeada.
+
+## Requisitos
+
+- Node.js 22
+- npm
+- Backend WeatherMeal corriendo
+- Docker, solo para ejecución containerizada o deploy
+
+## Variables de Entorno
+
+El frontend usa variables solo en Docker/Nginx. Para desarrollo con `ng serve`, basta con `proxy.conf.json`.
+
+Archivo de referencia:
 
 ```bash
-ng generate --help
+cp .env.sample .env
 ```
 
-## Building
+Variables:
 
-To build the project run:
+```env
+FRONTEND_PORT=8080
+BACKEND_URL=http://host.docker.internal:3000
+```
+
+`BACKEND_URL` debe ser la URL del backend vista desde el contenedor frontend. Si el backend está publicado en el mismo servidor por IP pública, puede ser:
+
+```env
+BACKEND_URL=http://206.189.197.214:3000
+```
+
+Evitar slash final en `BACKEND_URL`, porque puede afectar la forma en que Nginx reenvía `/api/v1/...`.
+
+## Ejecución Local
+
+Instalar dependencias:
 
 ```bash
-ng build
+npm ci
 ```
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
+Levantar el backend en `http://localhost:3000`.
+
+Levantar el frontend:
+
+```bash
+npm start
+```
+
+Abrir:
+
+```text
+http://localhost:4200
+```
+
+## Build
+
+```bash
+npm run build -- --progress=false
+```
+
+El build queda en:
+
+```text
+dist/frontend/browser
+```
 
 ## Docker
 
-Build the frontend image:
+Construir imagen:
 
 ```bash
 docker build -t weathermeal-frontend .
 ```
 
-Run the container against a backend running on the host machine at port `3000`:
+Ejecutar contra backend local:
 
 ```bash
 docker run --rm -p 8080:80 -e BACKEND_URL=http://host.docker.internal:3000 weathermeal-frontend
 ```
 
-Open `http://localhost:8080/`.
+Abrir:
 
-The container serves the Angular production build with Nginx. Requests to `/api/*` are proxied to `BACKEND_URL`, so the frontend continues consuming the backend through the same relative API paths used in local development.
+```text
+http://localhost:8080
+```
 
-## Production deployment
+## Docker Compose
 
-The repository includes a GitHub Actions pipeline at `.github/workflows/deploy.yml`. It follows the same deployment strategy as the backend:
+Crear `.env` desde el sample:
 
-1. Validate the Angular build on `main`.
-2. Sync the repository to the server with `rsync`.
-3. Run `scripts/deploy.sh` remotely.
-4. Start or rebuild the container with Docker Compose.
+```bash
+cp .env.sample .env
+```
 
-Required GitHub environment secrets:
+Levantar:
+
+```bash
+docker compose up --build -d
+```
+
+Ver logs:
+
+```bash
+docker logs weathermeal-frontend
+```
+
+Probar el proxy desde el servidor:
+
+```bash
+curl -i http://localhost:8080/api/v1/locations/chile/regions
+```
+
+## Deploy
+
+El pipeline está en:
+
+```text
+.github/workflows/deploy.yml
+```
+
+Sigue la misma estrategia del backend:
+
+1. Valida el build Angular en `main`.
+2. Sincroniza el repositorio al servidor con `rsync`.
+3. Ejecuta `scripts/deploy.sh` por SSH.
+4. Reconstruye y levanta el contenedor con Docker Compose.
+
+Secrets requeridos en el environment `production` de GitHub:
 
 ```text
 DROPLET_HOST
@@ -71,46 +189,25 @@ DROPLET_USER
 DROPLET_SSH_KEY
 ```
 
-Optional GitHub environment variables:
+Variables opcionales del environment `production`:
 
 ```text
 DROPLET_PORT=22
 DEPLOY_PATH=/opt/weathermeal/frontend
 ```
 
-Optional server `.env` values inside `DEPLOY_PATH`:
+En el servidor debe existir el archivo:
 
 ```text
+/opt/weathermeal/frontend/.env
+```
+
+Ejemplo:
+
+```env
 FRONTEND_PORT=8080
-BACKEND_URL=http://host.docker.internal:3000
+BACKEND_URL=http://206.189.197.214:3000
 ```
 
-You can use `.env.sample` as the base for the server `.env` file:
+El deploy excluye `.env`, por lo que ese archivo se crea una vez en el servidor y se mantiene entre despliegues.
 
-```bash
-cp .env.sample .env
-```
-
-`BACKEND_URL` should point to the backend as seen from the frontend container. The default works when the backend publishes port `3000` on the same Docker host.
-
-## Running unit tests
-
-To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
-
-```bash
-ng test
-```
-
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
-
-```bash
-ng e2e
-```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
