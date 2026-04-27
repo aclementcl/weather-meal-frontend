@@ -54,6 +54,45 @@ Open `http://localhost:8080/`.
 
 The container serves the Angular production build with Nginx. Requests to `/api/*` are proxied to `BACKEND_URL`, so the frontend continues consuming the backend through the same relative API paths used in local development.
 
+## Production deployment
+
+The repository includes a GitHub Actions pipeline at `.github/workflows/deploy.yml`. It follows the same deployment strategy as the backend:
+
+1. Validate the Angular build on `main`.
+2. Sync the repository to the server with `rsync`.
+3. Run `scripts/deploy.sh` remotely.
+4. Start or rebuild the container with Docker Compose.
+
+Required GitHub environment secrets:
+
+```text
+DROPLET_HOST
+DROPLET_USER
+DROPLET_SSH_KEY
+```
+
+Optional GitHub environment variables:
+
+```text
+DROPLET_PORT=22
+DEPLOY_PATH=/opt/weathermeal/frontend
+```
+
+Optional server `.env` values inside `DEPLOY_PATH`:
+
+```text
+FRONTEND_PORT=8080
+BACKEND_URL=http://host.docker.internal:3000
+```
+
+You can use `.env.sample` as the base for the server `.env` file:
+
+```bash
+cp .env.sample .env
+```
+
+`BACKEND_URL` should point to the backend as seen from the frontend container. The default works when the backend publishes port `3000` on the same Docker host.
+
 ## Running unit tests
 
 To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
